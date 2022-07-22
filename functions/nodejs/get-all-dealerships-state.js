@@ -1,5 +1,5 @@
 /**
- * Get all dealerships
+ * Get all dealerships matching state
  */
 
 const { CloudantV1 } = require('@ibm-cloud/cloudant');
@@ -12,27 +12,35 @@ function main(params) {
       authenticator: authenticator
     });
     cloudant.setServiceUrl(params.COUCH_URL);
-
-    let dbListPromise = getDbs(cloudant);
+    let dbListPromise = "";
+    if(params.VALUE=== ""){
+          let dbListPromise = getAllRecords(cloudant,"dealerships");
+    }else{
+          let dbListPromise = getMatchingRecords(cloudant,"dealerships",{state:params.VALUE});
+    }
     return dbListPromise;
 }
 
-function getDbs(cloudant) {
+
+
+ /*
+ Sample implementation to get all the records in a db.
+ */
+ function getAllRecords(cloudant,dbname) {
      return new Promise((resolve, reject) => {
-         cloudant.getAllDbs()
-             .then(body => {
-                 resolve({ dbs: body.result });
+         cloudant.postAllDocs({ db: dbname, includeDocs: true, limit: 10 })
+             .then((result)=>{
+               resolve({result:result.result.rows});
              })
              .catch(err => {
-                  console.log(err);
-                 reject({ err: err });
+                console.log(err);
+                reject({ err: err });
              });
-     });
+         })
  }
- 
- 
- /*
- Sample implementation to get the records in a db based on a selector. If selector is empty, it returns all records. 
+
+  /*
+ Sample implementation to get the records in a db based on a selector. If selector is empty, it returns all records.
  eg: selector = {state:"Texas"} - Will return all records which has value 'Texas' in the column 'State'
  */
  function getMatchingRecords(cloudant,dbname, selector) {
@@ -46,21 +54,4 @@ function getDbs(cloudant) {
                      reject({ err: err });
                  });
           })
- }
- 
-                        
- /*
- Sample implementation to get all the records in a db.
- */
- function getAllRecords(cloudant,dbname) {
-     return new Promise((resolve, reject) => {
-         cloudant.postAllDocs({ db: dbname, includeDocs: true, limit: 10 })            
-             .then((result)=>{
-               resolve({result:result.result.rows});
-             })
-             .catch(err => {
-                console.log(err);
-                reject({ err: err });
-             });
-         })
  }
