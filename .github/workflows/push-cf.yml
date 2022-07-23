@@ -48,8 +48,7 @@ jobs:
         shell: bash
       - name: Create env file
         run: |
-          mkdir -p ~/server
-          cd ~/server
+          cd /home/runner/work/agfzb-CloudAppDevelopment_Capstone/agfzb-CloudAppDevelopment_Capstone/server
           touch .env
           echo URL=${{ secrets.NLU_URL }} >> .env
           echo API_KEY=${{secrets.NLU_API_KEY}} >> .env
