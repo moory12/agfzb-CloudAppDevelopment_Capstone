@@ -43,10 +43,13 @@ jobs:
       - name: List all applications
         run: ibmcloud cf apps
         shell: bash
+      - name: Deploy manifest file
+        run: ibmcloud cf push -f ./$MANIFEST_NAME
+        shell: bash
       - name: Create env file
         run: |
-          mkdir -p server
-          cd /server
+          mkdir -p ~/server
+          cd ~/server
           touch .env
           echo URL=${{ secrets.NLU_URL }} >> .env
           echo API_KEY=${{secrets.NLU_API_KEY}} >> .env
@@ -54,6 +57,4 @@ jobs:
           echo FUNCTION_REVIEW=${{secrets.FUNCTION_REVIEW_URL}} >> .env
           echo FUNCTION_DEALER=${{secrets.FUNCTION_DEALER_URL}} >> .env
           cat .env
-      - name: Deploy manifest file
-        run: ibmcloud cf push -f ./$MANIFEST_NAME
         shell: bash
