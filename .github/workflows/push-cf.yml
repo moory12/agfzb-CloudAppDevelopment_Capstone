@@ -45,7 +45,7 @@ jobs:
         shell: bash
       - name: Create env file
         run: |
-          touch /server/.env
+          touch ./server/.env
           echo URL=${{ secrets.NLU_URL }} >> .env
           echo API_KEY=${{secrets.NLU_API_KEY}} >> .env
           echo VERSION=${{secrets.NLU_VERSION}} >> .env
