@@ -52,7 +52,7 @@ jobs:
           echo URL=${{ secrets.NLU_URL }} >> .env
           echo API_KEY=${{secrets.NLU_API_KEY}} >> .env
           echo VERSION=${{secrets.NLU_VERSION}} >> .env
-          echo FUNCTION_REVIEW=${{secrets.FUNCTION_REVIEW_URL}} >> .env
-          echo FUNCTION_DEALER=${{secrets.FUNCTION_DEALER_URL}} >> .env
+          echo FUNCTION_REVIEW_URL=${{secrets.FUNCTION_REVIEW_URL}} >> .env
+          echo FUNCTION_DEALER_URL=${{secrets.FUNCTION_DEALER_URL}} >> .env
           cat .env
         shell: bash
