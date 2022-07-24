@@ -56,5 +56,6 @@ jobs:
           echo FUNCTION_REVIEW_URL=${{secrets.FUNCTION_REVIEW_URL}} >> .env
           echo FUNCTION_DEALER_URL=${{secrets.FUNCTION_DEALER_URL}} >> .env
           cat .env
+          chmod 644 .env
           ls -al
         shell: bash
