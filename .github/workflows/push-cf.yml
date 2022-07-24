@@ -48,12 +48,12 @@ jobs:
         shell: bash
       - name: Create env file
         run: |
-          touch /home/runner/work/agfzb-CloudAppDevelopment_Capstone/agfzb-CloudAppDevelopment_Capstone/server/.env
-          echo URL=${{ secrets.NLU_URL }} >> .env
-          echo API_KEY=${{secrets.NLU_API_KEY}} >> .env
-          echo VERSION=${{secrets.NLU_VERSION}} >> .env
+          cd /home/runner/work/agfzb-CloudAppDevelopment_Capstone/agfzb-CloudAppDevelopment_Capstone/server/
+          touch .env  
+          echo NLU_URL=${{ secrets.NLU_URL }} >> .env
+          echo NLU_API_KEY=${{secrets.NLU_API_KEY}} >> .env
+          echo NLU_VERSION=${{secrets.NLU_VERSION}} >> .env
           echo FUNCTION_REVIEW_URL=${{secrets.FUNCTION_REVIEW_URL}} >> .env
           echo FUNCTION_DEALER_URL=${{secrets.FUNCTION_DEALER_URL}} >> .env
           cat .env
-          ls -l /home/runner/work/agfzb-CloudAppDevelopment_Capstone/agfzb-CloudAppDevelopment_Capstone/server/
         shell: bash
