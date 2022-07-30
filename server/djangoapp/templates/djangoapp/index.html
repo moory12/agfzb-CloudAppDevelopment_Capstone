@@ -16,38 +16,66 @@
 
 <body>
 <!--Add a nav bar here -->
-    <nav class="navbar navbar-light bg-light">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="{% url 'djangoapp:index' %}">Home</a>
-                <a class="navbar-brand" href="{% url 'djangoapp:contact' %}">Contact Us</a>
-                <a class="navbar-brand" href="{% url 'djangoapp:about' %}">About us</a>
-            </div>
-            <ul class="nav navbar-nav navbar-right">
-                {% if user.is_authenticated %}
+<nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{% url 'djangoapp:index' %}">Home</a>
+            <a class="navbar-brand" href="{% url 'djangoapp:contact' %}">Contact Us</a>
+            <a class="navbar-brand" href="{% url 'djangoapp:about' %}">About us</a>
+        </div>
+        <ul class="nav navbar-nav navbar-right">
+            {% if user.is_authenticated %}
                 <li>
                     <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
                     <a class="btn btn-link" href="{% url 'djangoapp:logout' %}">Logout</a>
                 </li>
-                {% else %}
+            {% else %}
                 <li>
                     <form class="form-inline" action="{% url 'djangoapp:login' %}" method="post">
                         {% csrf_token %}
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Username" name="username" >
-                            <input type="password" class="form-control" placeholder="Username" name="psw" >
+                            <input type="text" class="form-control" placeholder="Username" name="username">
+                            <input type="password" class="form-control" placeholder="Username" name="psw">
                             <button class="btn btn-primary" type="submit">Login</button>
                             <a class="btn btn-link" href="{% url 'djangoapp:registration' %}">Sign Up</a>
                         </div>
                     </form>
                 </li>
-                {% endif %}
-            </ul>
-        </div>
-    </nav>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
 
 <!--Add a dealer table here -->
+<table class="table table-striped" id="table" data-filter-control="true">
+    <thead>
+    <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Dealer Name</th>
+        <th scope="col">City</th>
+        <th scope="col">Address</th>
+        <th scope="col">Zip</th>
+        <th data-field="state" data-filter-control="select" scope="col">State</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for dealership in dealerships %}
+        <tr>
+            <td>{{ dealership.id }}</td>
+            <td><a href="{% url 'djangoapp:dealerReview' dealership.id %}">{{ dealership.full_name  }}</a></td>
+            <td>{{ dealership.city }}</td>
+            <td>{{ dealership.address }}</td>
+            <td>{{ dealership.zip }}</td>
+            <td>{{ dealership.st }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
 
+</table>
 </body>
-
+<script>
+  $(function() {
+    $('#table').bootstrapTable()
+  })
+</script>
 </html>

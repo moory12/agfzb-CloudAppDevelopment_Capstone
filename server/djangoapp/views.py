@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
-# from .models import related models
+from .models import CarDealer, CarModel, CarMake
 # from .restapis import related methods
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
@@ -90,13 +90,13 @@ def get_dealerships(request):
     if request.method == "GET":
         load_dotenv()
         dealer_function_url = os.getenv("FUNCTION_DEALER_URL")
-        url = dealer_function_url
+        context = {}
         # Get dealers from the URL
-        dealerships = get_dealers_from_cf(url)
+        dealerships = get_dealers_from_cf(dealer_function_url)
         # Concat all dealer's short name
-        dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
+        context['dealerships'] = dealerships
         # Return a list of dealer short name
-        return HttpResponse(dealer_names)
+        return render(request, 'djangoapp/index.html', context)
 
 
 def get_dealerships_by_state(request, state):
@@ -130,32 +130,44 @@ def get_dealer_details(request, dealer_id):
     if request.method == "GET":
         load_dotenv()
         review_function_url = os.getenv("FUNCTION_REVIEW_URL")
+        context = {}
         url = review_function_url
         # Get dealers from the URL
         dealerships = get_dealer_reviews_from_cf(url, dealer_id)
         # Concat all dealer's short name
-        dealer_names = ' '.join([dealer.__str__() for dealer in dealerships])
+        context['dealershipDetails'] = dealerships
+        context['dealer_id'] = dealer_id
+        for dealer in dealerships:
+            if dealer.sentiment == 'negative':
+                dealer.sentiment = 'negative.png'
+            elif dealer.sentiment == 'positive':
+                dealer.sentiment = 'positive.png'
+            else:
+                dealer.sentiment = 'neutral.png'
+
         # Return a list of dealer short name
-        return HttpResponse(dealer_names)
+        return render(request, 'djangoapp/dealer_details.html', context)
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
 # def get_dealer_details(request, dealer_id):
 # ...
 
+
 # Create a `add_review` view to submit a review
-@csrf_exempt
 def add_review(request, dealer_id):
-    if request.user.is_authenticated:
+    if request.method == 'POST':
+        print(request.POST)
+        car_model = get_object_or_404(CarModel, pk=request.POST['car'])
         review = dict()
         review["time"] = datetime.utcnow().isoformat()
         review["dealership"] = dealer_id
-        review["review"] = request.POST['review']
-        review["name"] = request.POST['name']
-        review["purchase"] = request.POST['purchase']
-        review["purchase_date"] = request.POST['purchase_date']
-        review["car_make"] = request.POST['car_make']
-        review["car_model"] = request.POST['car_model']
-        review["car_year"] = request.POST['car_year']
+        review["review"] = request.POST['content']
+        review["name"] = car_model.name
+        review["purchase"] = request.POST['purchasecheck']
+        review["purchase_date"] = request.POST['purchasedate']
+        review["car_make"] = car_model.carMake.name
+        review["car_model"] = car_model.name
+        review["car_year"] = car_model.year.year
 
         json_payload = dict()
         json_payload["REVIEW"] = review
@@ -163,6 +175,15 @@ def add_review(request, dealer_id):
         review_function_url = os.getenv("FUNCTION_REVIEW_URL")
         url = review_function_url
         response = post_request(url=url, json_payload=json_payload)
-        return HttpResponse(response)
+        return redirect("djangoapp:dealerReview", dealer_id=dealer_id)
+    else:
+        context = {}
+        try:
+            load_dotenv()
+            url = os.getenv("FUNCTION_DEALER_URL")
+            context['dealer'] = get_dealer_from_cf_by_id(url, dealer_id)
+            context['cars'] = CarModel.objects.filter(dealer_id=dealer_id)
+        except:
+            return render(request, 'djangoapp/index.html')
 
-
+        return render(request, 'djangoapp/add_review.html', context)
